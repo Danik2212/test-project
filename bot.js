@@ -1,5 +1,3 @@
-
-
 injectScripts();
 
 var NEXT_ID = 20;
