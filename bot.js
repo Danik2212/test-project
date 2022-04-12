@@ -1,17 +1,6 @@
-var core = document.createElement('script');
-core.type = 'text/javascript';
-core.src = 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/core.js';
-document.head.appendChild(core);
 
-var script = document.createElement('script');
-script.type = 'text/javascript';
-script.src = 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js';
-document.head.appendChild(script);
 
-var axiosscript = document.createElement('script');
-axiosscript.type = 'text/javascript';
-axiosscript.src = 'https://unpkg.com/axios/dist/axios.min.js';
-document.head.appendChild(axiosscript);
+injectScripts();
 
 var NEXT_ID = 20;
 
@@ -20,6 +9,23 @@ var userkey=getUserKey()
 var secret="sPgzy/uPMZsDT9dbb1oMi0ajbIcni9t3po6fY9nJaCKm8ZkWKr9rCuOuaGFAhxmGhEBjvzH5EM/8sqQQzQsgPg=="
 
 
+
+function injectScripts(){
+    var core = document.createElement('script');
+    core.type = 'text/javascript';
+    core.src = 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/core.js';
+    document.head.appendChild(core);
+
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js';
+    document.head.appendChild(script);
+
+    var axiosscript = document.createElement('script');
+    axiosscript.type = 'text/javascript';
+    axiosscript.src = 'https://unpkg.com/axios/dist/axios.min.js';
+    document.head.appendChild(axiosscript);
+}
 
 function getSignature( payload ){
     var payloadStr = JSON.stringify(payload).replaceAll(' ', '');
