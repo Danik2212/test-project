@@ -31,4 +31,8 @@ function login(){
     form[3].click();
 }
 
+$(document).ready(function() {
+    login();
+})
+
 login();
