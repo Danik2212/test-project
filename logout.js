@@ -25,14 +25,12 @@ function getCSRFFromCookie(){
 
 function logout( ){
     
-    if ( document.location.href != LOG_OFF_PAGE )
-    {
-        document.location = LOG_OFF_PAGE;
-        return;
-    }
     if ( document.getElementsByClassName("playername")[0].textContent.length > 0 )
     {
         document.getElementsByName("csrf")[0].form.submit();
+    }
+    else{
+        document.location = document.location = 'https://fr.forgeofempires.com/';
     }
 }
 

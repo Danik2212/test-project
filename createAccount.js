@@ -15,6 +15,24 @@ document.head.appendChild(axiosscript);
 
 /// ACCOUNT CREATION
 
+function login(){
+
+    if ( document.getElementsByClassName("playername")[0].textContent.length > 0 )
+    {
+        // You are logged in now
+        console.log( "Logged in now");
+        return;
+    }
+
+    var userName = ". Dan";
+    var password = "Jenny123"
+    var form = document.getElementById("login_userid").form;
+
+    form[0].value = userName
+    form[1].value = password
+    form[3].click();
+}
+
 
 function createNewAccount(){
     if ( document.location.href != 'https://fr.forgeofempires.com/' )
