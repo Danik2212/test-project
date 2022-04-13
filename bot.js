@@ -40,7 +40,9 @@ async function sendPost( payload ){
     const options = {
         headers: { 'signature' : getSignature( payload ) }
     }
-    await axios.post(url, payload, options).then( data=>console.log( data )).catch(err=>console.log( err) )
+    res = await axios.post(url, payload, options);
+    console.log( res ); 
+    return res;
 }
 
 function getNextId(){
@@ -98,6 +100,18 @@ async function testsend(){
 
 
 /// BOT
+
+
+async function acceptAll50Diamonds(){
+    var payload = [{"__class__":"ServerRequest","requestData":[],"requestClass":"FriendService","requestMethod":"startup","requestId":getNextId()}]
+    var res = await sendPost( payload );
+    var friends = res.data[1]['responseData']['invitation_reward_groups'][0].friends;
+    for (const friend of friends) { 
+        payload = [{"__class__":"ServerRequest","requestData":[friend.player.player_id,1],"requestClass":"FriendService","requestMethod":"collectInvitationReward","requestId":getNextId()}]
+        var res = await sendPost( payload );
+    };
+
+}
 
 
 
