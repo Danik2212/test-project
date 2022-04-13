@@ -20,15 +20,12 @@ document.head.appendChild(axiosscript);
 var LOG_OFF_PAGE = "https://fr0.forgeofempires.com/page/the_game/basics/"
 var LOG_IN_PAGE = "https://fr0.forgeofempires.com/page/"
 
-$(window).load(function(e) {
-    if ( document.location.href == LOG_OFF_PAGE ){
-        logout();
-    }
-    else if (document.location.href == LOG_IN_PAGE){
-        login();
-    }
-});
-
+if ( document.location.href == LOG_OFF_PAGE ){
+    logout();
+}
+else if (document.location.href == LOG_IN_PAGE){
+    login();
+}
 
 
 function createNewAccount(){
