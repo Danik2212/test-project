@@ -23,15 +23,35 @@ function getCSRFFromCookie(){
 
 
 
+function checkState(){
+    if ( window.localStorage.getItem('state') == 'login'){
+        // Select the world and log in
+        selectWorld();
+        window.localStorage.setItem('state', 'inGame');
+    }
+
+    if ( window.localStorage.getItem('state') == 'inGame'){
+        logout();
+        window.localStorage.setItem('state', 'logout');
+        // Go to login/create account
+        document.location = document.location = 'https://fr.forgeofempires.com/';
+    }
+    // Weird state, try to reset it
+    else{
+        window.localStorage.setItem('state', 'inGame');
+        window.location = 'https://fr0.forgeofempires.com/page'
+    }
+}
+
 function logout( ){
-    
     if ( document.getElementsByClassName("playername")[0].textContent.length > 0 )
     {
         document.getElementsByName("csrf")[0].form.submit();
     }
-    else{
-        document.location = document.location = 'https://fr.forgeofempires.com/';
-    }
 }
 
-logout();
+function selectWorld(){
+    
+}
+
+checkState();
