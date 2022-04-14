@@ -13,9 +13,9 @@ axiosscript.type = 'text/javascript';
 axiosscript.src = 'https://unpkg.com/axios/dist/axios.min.js';
 document.head.appendChild(axiosscript);
 
-/// ACCOUNT CREATION
 
-function login(){
+
+function login_manual(){
 
     if ( document.getElementsByClassName("playername")[0].textContent.length > 0 )
     {
@@ -33,8 +33,39 @@ function login(){
     form[3].click();
 }
 
+async function login(){
+    var userName = "Jenny123";
+    var password = "22122212"
+    var payload = "login[userid]=" + userName + "&login[password]=" + password + "&login[remember_me]=false"
+    var encodedPayload = encodeURI(payload);
+    await sendLoginPost( encodedPayload );
+}
 
-function createNewAccount(){
+async function sendLoginPost( payload ){
+
+    var url = "https://fr.forgeofempires.com/glps/login_check"
+    const options = {
+        headers: { 'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+    }
+    }
+    axios.post(url, payload, options).then( data=>{
+        console.log( data );
+        brower.navigate_to( data.redirect_url );
+        //document.location = data.redirect_url
+        //data.player_id
+        return {
+            url : data.redirect_url,
+            id : data.player_id
+        }
+    }
+    
+    ).catch(err=>console.log( err) )
+}
+
+
+/// ACCOUNT CREATION
+
+async function createNewAccount(){
     if ( document.location.href != 'https://fr.forgeofempires.com/' )
     {
         document.location = 'https://fr.forgeofempires.com/';
@@ -43,8 +74,9 @@ function createNewAccount(){
 
     var username = getRandomUsername();
     var password = getRandomPassword();
-    var payload = "registration%5Bnickname%5D=" + username +"&registration%5Bpassword%5D=" + password + "&registration%5BacceptTerms%5D=1&registration%5Baccepted3rdPartyPixels%5D=1"
-    var res = sendAccountCreationPost( payload );
+    var payload = "registration[nickname]=" + username + "&registration[password]=" + password + "&registration[acceptTerms]=1&registration[accepted3rdPartyPixels]=1"
+    var encodedPayload = encodeURI( payload );
+    var res = await sendAccountCreationPost( encodedPayload );
 
     var account = {
         name: username,
@@ -55,7 +87,7 @@ function createNewAccount(){
     }
 }
 
-function sendAccountCreationPost( payload ){
+async function sendAccountCreationPost( payload ){
     const url = "https://fr.forgeofempires.com/glps/registration";
     
     const options = {

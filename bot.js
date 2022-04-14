@@ -71,6 +71,19 @@ function getUserKey () {
 
 
 
+function logout( ){
+    if ( document.location.href != 'https://fr0.forgeofempires.com/page/')
+        document.location = document.location = 'https://fr0.forgeofempires.com/page/';
+        
+    if ( document.getElementsByClassName("playername")[0].textContent.length > 0 )
+    {
+        document.getElementsByName("csrf")[0].form.submit();
+    }
+    else
+    {
+        return true;
+    }
+}
 
 
 

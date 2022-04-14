@@ -14,8 +14,21 @@ axiosscript.src = 'https://unpkg.com/axios/dist/axios.min.js';
 document.head.appendChild(axiosscript);
 
 
-$(document).ready(function() {
-    login();
-})
+async function login(){
+    var world = 1;
+    var payload = 'json={"world_id":"fr'+world+'"}';
+    var encodedPayload = encodeURI(payload);
+    var res = await sendLoginPost( encodedPayload );
+    console.log( res );
+}
 
-login();
+async function sendLoginPost( payload ){
+
+    var url = "fr0.forgeofempires.com/start/index?action=play_now_login"
+    const options = {
+        headers: { 'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+    }
+    }
+    var data = await axios.post(url, payload, options);
+    return data;
+}
