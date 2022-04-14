@@ -3,8 +3,7 @@ injectScripts();
 var NEXT_ID = 20;
 
 
-var userkey=getUserKey()
-var secret="sPgzy/uPMZsDT9dbb1oMi0ajbIcni9t3po6fY9nJaCKm8ZkWKr9rCuOuaGFAhxmGhEBjvzH5EM/8sqQQzQsgPg=="
+
 
 
 
@@ -27,7 +26,8 @@ function injectScripts(){
 
 function getSignature( payload ){
     var payloadStr = JSON.stringify(payload).replaceAll(' ', '');
-
+    var secret = getSecret()
+    var userkey = getUserKey();
     var toEncode = userkey+secret+payloadStr
 
     var signature = substr(CryptoJS.MD5(toEncode).toString(),1,10)
@@ -35,6 +35,7 @@ function getSignature( payload ){
 }
 
 async function sendPost( payload ){
+    var userKey = getUserKey();
     const url = "https://" + gameVars.world_id + ".forgeofempires.com/game/json?h=" + userkey;
     
     const options = {
@@ -69,6 +70,10 @@ function getUserKey () {
     return m[1];
 }
 
+function getSecret(){
+    var secret="sPgzy/uPMZsDT9dbb1oMi0ajbIcni9t3po6fY9nJaCKm8ZkWKr9rCuOuaGFAhxmGhEBjvzH5EM/8sqQQzQsgPg=="
+    return secret;
+}
 
 
 function logout( ){
