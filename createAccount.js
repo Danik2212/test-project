@@ -17,7 +17,7 @@ document.head.appendChild(axiosscript);
 
 function login_manual(){
 
-    if ( document.getElementsByClassName("playername")[0].textContent.length > 0 )
+    if ( document.getElementsByClassName("playername")[0] != undefined && document.getElementsByClassName("playername")[0].textContent.length > 0 )
     {
         // You are logged in now
         console.log( "Logged in now");
@@ -72,8 +72,10 @@ async function createNewAccount(){
         return;
     }
 
-    var username = getRandomUsername();
-    var password = getRandomPassword();
+    //var username = getRandomUsername();
+    //var password = getRandomPassword();
+    var username = "Jenny123"
+    var password = "22122212"
     var payload = "registration[nickname]=" + username + "&registration[password]=" + password + "&registration[acceptTerms]=1&registration[accepted3rdPartyPixels]=1"
     var encodedPayload = encodeURI( payload );
     var res = await sendAccountCreationPost( encodedPayload );
@@ -96,7 +98,7 @@ async function sendAccountCreationPost( payload ){
     }
     axios.post(url, payload, options).then( data=>{
         console.log( data );
-        brower.navigate_to( data.redirect_url );
+        broswer.navigate_to( data.redirect_url );
         //document.location = data.redirect_url
         //data.player_id
         return {
