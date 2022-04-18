@@ -1,0 +1,50 @@
+CREATE TABLE `accounts` (
+  `accountId` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  `step` int NOT NULL,
+  `readyOn` datetime NOT NULL,
+  `world` int NOT NULL,
+  `type` char(1) DEFAULT NULL,
+  PRIMARY KEY (`accountId`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `settings` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `world` int DEFAULT NULL,
+  `type` char(1) DEFAULT NULL,
+  `url` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `worker` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `accountId` int NOT NULL DEFAULT '-1',
+  `state` varchar(100) NOT NULL DEFAULT 'disconnect',
+  `status` tinyint NOT NULL DEFAULT '0',
+  `pause` tinyint NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `foebot`.`worker`
+(`id`,
+`accountId`,
+`state`,
+`status`,
+`pause`)
+VALUES
+('1', '21', 'disconnect', '0', '1');
+
+INSERT INTO `foebot`.`settings`
+(`id`,
+`world`,
+`type`,
+`url`)
+VALUES
+('1', '1', 'D', 'https://fr.forgeofempires.com/?invitation=850723702-fr1-l&ref=player_invite_link');
+
+
+
+
+
+
