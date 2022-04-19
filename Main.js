@@ -22,7 +22,13 @@
 
 $(document).ready(async function() { manageState() });
 
+// 3 minute timeout
+setTimeout(resetState, 180000);
+
 var NEXT_ID = 20;
+
+var SEND_FUNC = XMLHttpRequest.prototype.send;
+var STOP_SEND_FUNC = function() {return false;}
 
 /// STATE MANAGER
 
@@ -115,6 +121,11 @@ async function manageState(){
     }
 }
 
+async function resetState(){
+    await setState("disconnect")
+    await reload();
+}
+
 async function waitForStatusToBeActive(){
     while(1){
         await new Promise(r => setTimeout(r, 5000));
@@ -132,6 +143,7 @@ async function waitForStatusToBeActive(){
 /// CORE FUNCTIONS
 
 async function axiosGet( url ){
+    XMLHttpRequest.prototype.send = SEND_FUNC;
     try{
         var res = await axios.get(url);
         return res;
@@ -140,9 +152,11 @@ async function axiosGet( url ){
         console.log( err );
         await new Promise(r => setTimeout(r, 20000));
     }
+
 }
 
 async function axiosPost( url, params, options ){
+    XMLHttpRequest.prototype.send = SEND_FUNC;
     try{
         var res = await axios.post(url, params, options);
         return res;
@@ -155,12 +169,12 @@ async function axiosPost( url, params, options ){
 
 async function navigateTo( url ){
     document.location = url;
-    await new Promise(r => setTimeout(r, 5000));
+    await new Promise(r => setTimeout(r, 100000));
 } 
 
 async function reload(){
     document.location.reload();
-    await new Promise(r => setTimeout(r, 5000));
+    await new Promise(r => setTimeout(r, 100000));
 }
 
 function getSignature( payload ){
@@ -178,9 +192,13 @@ async function sendPost( payload ){
     const url = "https://" + gameVars.world_id + ".forgeofempires.com/game/json?h=" + userkey;
 
     const options = {
-        headers: { 'signature' : getSignature( payload ) }
+
+        headers: {  'Accept': '*/*',
+                    'client-identification': "version=1.228; requiredVersion=1.228; platform=bro; platformType=html5; platformVersion=web",
+                    'signature' : getSignature( payload ) }
     }
     var res = await axiosPost(url, payload, options);
+    XMLHttpRequest.prototype.send = STOP_SEND_FUNC;
     console.log( res );
     return res;
 }
@@ -375,7 +393,12 @@ async function goToLoginPage(){
 
 
 async function login( nextAccount ){
-    if ( document.location.href != 'https://fr.forgeofempires.com/' )
+    if ( nextAccount.step == 0 ){
+        await setState("inWorld");
+        await navigateTo( nextAccount.redirect_url );
+        return 
+    }
+    else if ( document.location.href != 'https://fr.forgeofempires.com/' )
     {
         await navigateTo( 'https://fr.forgeofempires.com/' );
         return false;
@@ -387,7 +410,9 @@ async function login( nextAccount ){
     var payload = "registration[nickname]=" + username + "&registration[password]=" + password + "&registration[acceptTerms]=1&registration[accepted3rdPartyPixels]=1"
     var encodedPayload = encodeURI( payload );
     var res = await sendAccountCreationPost( encodedPayload );
-    await setAccountId( nextAccount.accountId);
+    if ( res.data.success == false ){
+        await reload();
+    }
     return true;
 }
 
@@ -407,14 +432,18 @@ async function createNewAccount(){
     var encodedPayload = encodeURI( payload );
     var res = await sendAccountCreationPost( encodedPayload );
 
-
+    if ( res.data.success == false ){
+        await navigateTo( settings.url );
+    }
     var account = {
         name: username,
         password: password,
         step: 0,
         world: settings.world,
         type: settings.type,
-        readyOn: new Date().toISOString().slice(0, 19).replace('T', ' ')
+        readyOn: new Date().toISOString().slice(0, 19).replace('T', ' '),
+        redirect_url: res.data.redirect_url,
+        locked: 1
     }
     var accountId = await saveNewAccount(account);
     await setAccountId( accountId);
@@ -450,6 +479,17 @@ async function logToWorld(){
         return false;
     }
 
+    // Check if logged in
+    while(1){
+        if ( document.getElementsByClassName("playername")[0] )
+        {
+            if ( document.getElementsByClassName("playername")[0].textContent.length == 0 ){
+                await resetState();
+            }
+            break;
+        }
+    }
+
     var settings = await getSettings();
     while(1){
         if (  document.getElementsByName("play")[0] )
@@ -482,6 +522,18 @@ async function logToWorld(){
 /// DO STEPS
 
 async function doStep(){
+    var inc = 0;
+    while(1){
+        await new Promise(r => setTimeout(r, 1000));
+        if( typeof gameVars != 'undefined'  ){
+            break;
+        }
+        inc++;
+        if ( inc > 10){
+            await resetState();
+        }
+    }
+
     var accountId = await getAccountId();
     console.log( accountId );
     var account = await getAccount(accountId);
