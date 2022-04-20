@@ -25,10 +25,24 @@ $(document).ready(async function() { manageState() });
 // 3 minute timeout
 setTimeout(resetState, 180000);
 
-var NEXT_ID = 20;
+var NEXT_ID = 1;
 
-var SEND_FUNC = XMLHttpRequest.prototype.send;
-var STOP_SEND_FUNC = function() {return false;}
+unsafeWindow.SEND_FUNC = XMLHttpRequest.prototype.send;
+unsafeWindow.STOP_SEND_FUNC = function() {return false;}
+
+unsafeWindow.SNIFFER = XMLHttpRequest.prototype.send;
+XMLHttpRequest.prototype.send = function(data) {
+    try{
+    	var body = JSON.parse(decodeURIComponent(String.fromCharCode.apply(null,new Uint8Array(data))));
+		for( var i in body ){ 
+			console.log( body[i].requestId );
+			if ( body[i].requestId >= NEXT_ID ){
+				NEXT_ID = body[i].requestId + 1;
+			}
+		}
+	}catch(e){};
+    unsafeWindow.SNIFFER.call(this, data);
+}
 
 /// STATE MANAGER
 
@@ -143,7 +157,6 @@ async function waitForStatusToBeActive(){
 /// CORE FUNCTIONS
 
 async function axiosGet( url ){
-    XMLHttpRequest.prototype.send = SEND_FUNC;
     try{
         var res = await axios.get(url);
         return res;
@@ -156,7 +169,6 @@ async function axiosGet( url ){
 }
 
 async function axiosPost( url, params, options ){
-    XMLHttpRequest.prototype.send = SEND_FUNC;
     try{
         var res = await axios.post(url, params, options);
         return res;
@@ -190,24 +202,22 @@ function getSignature( payload ){
 async function sendPost( payload ){
     var userkey = getUserKey();
     const url = "https://" + gameVars.world_id + ".forgeofempires.com/game/json?h=" + userkey;
-
+    
     const options = {
-
+        
         headers: {  'Accept': '*/*',
-                    'client-identification': "version=1.228; requiredVersion=1.228; platform=bro; platformType=html5; platformVersion=web",
-                    'signature' : getSignature( payload ) }
+        'client-identification': "version=1.228; requiredVersion=1.228; platform=bro; platformType=html5; platformVersion=web",
+        'signature' : getSignature( payload ) }
     }
+    //XMLHttpRequest.prototype.send = unsafeWindow.SEND_FUNC;
     var res = await axiosPost(url, payload, options);
-    XMLHttpRequest.prototype.send = STOP_SEND_FUNC;
+    //XMLHttpRequest.prototype.send = unsafeWindow.STOP_SEND_FUNC;
     console.log( res );
     return res;
 }
 
 function getNextId(){
     NEXT_ID++;
-    if ( NEXT_ID > 254 ){
-        NEXT_ID = 0;
-    }
     return NEXT_ID;
 }
 
@@ -427,7 +437,7 @@ async function createNewAccount(){
     }
 
     var username = getRandomUsername();
-    var password = getRandomPassword();
+    var password = "22122212";
     var payload = "registration[nickname]=" + username + "&registration[password]=" + password + "&registration[acceptTerms]=1&registration[accepted3rdPartyPixels]=1"
     var encodedPayload = encodeURI( payload );
     var res = await sendAccountCreationPost( encodedPayload );
@@ -473,6 +483,12 @@ async function logToWorld(){
     if( typeof gameVars !== 'undefined'  ){
         return true;
     }
+    if ( document.location.href.includes("banned_player"))
+    {
+        await setAccountId(-1);
+        await resetState();
+    }
+
     if ( document.location.href != 'https://fr0.forgeofempires.com/page/' )
     {
         await navigateTo( 'https://fr0.forgeofempires.com/page/' );
@@ -484,6 +500,7 @@ async function logToWorld(){
         if ( document.getElementsByClassName("playername")[0] )
         {
             if ( document.getElementsByClassName("playername")[0].textContent.length == 0 ){
+                await setAccountId(-1);
                 await resetState();
             }
             break;
@@ -515,7 +532,7 @@ async function logToWorld(){
 
             button.click();
         }
-    };
+    }
 }
 
 
@@ -534,6 +551,13 @@ async function doStep(){
         }
     }
 
+    console.log("Stopping sending queries")
+    XMLHttpRequest.prototype.send = unsafeWindow.STOP_SEND_FUNC;
+    await new Promise(r => setTimeout(r, 5000));
+    console.log("Reactivating queries")
+    XMLHttpRequest.prototype.send = unsafeWindow.SEND_FUNC;
+    console.log( XMLHttpRequest.prototype.send )
+    console.log( unsafeWindow.SEND_FUNC )
     var accountId = await getAccountId();
     console.log( accountId );
     var account = await getAccount(accountId);
