@@ -127,6 +127,7 @@ async function manageState(){
         else if ( state == "inWorld"){
             if ( await doStep() ){
                 await setState("disconnect")
+                await setAccountId( -1 );
             }
         }
 
@@ -211,6 +212,11 @@ async function sendPost( payload ){
     }
     //XMLHttpRequest.prototype.send = unsafeWindow.SEND_FUNC;
     var res = await axiosPost(url, payload, options);
+    if ( res && res[0] && res[0].title && res[0].title == "Exception" ){
+        var accountId = await getAccountId();
+        await setAccountProblematic( accountId );
+        await resetState();
+    }
     //XMLHttpRequest.prototype.send = unsafeWindow.STOP_SEND_FUNC;
     console.log( res );
     return res;
@@ -284,6 +290,15 @@ async function updateAccount(account){
     var res = await axiosPost(url, account);
 
     return res.data.accountId;
+}
+
+async function setAccountProblematic(accountid){
+    const url = "http://localhost:3000/accounts/problematic";
+
+
+    var res = await axiosPost(url, {"accountId":accountid});
+
+    return res.data;
 }
 
 async function getStatus(){
@@ -573,6 +588,7 @@ async function doStep(){
     next.setUTCHours( next.getUTCHours() + 10 );
     account.readyOn = next.toISOString().slice(0, 19).replace('T', ' ');
     await updateAccount(account);
+    await setAccountId( -1 );
     return true;
 
 }
