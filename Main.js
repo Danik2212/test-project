@@ -6,7 +6,7 @@
 // @author       You
 // @include      /.*forgeofempires.*/
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=forgeofempires.com
-// @require      https://unpkg.com/axios/dist/axios.min.js
+// @require      https://cdn.jsdelivr.net/gh/Danik2212/test-project@master/axios.min.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/core.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js
 // @grant GM_setValue
